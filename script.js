@@ -13,7 +13,7 @@ async function fetchCSVData() {
       title: cols[1]?.replace(/"/g, '').trim() || '',
       team: cols[2]?.replace(/"/g, '').trim() || '',
       location: cols[3]?.replace(/"/g, '').trim() || '',
-      linkedin: cols[4]?.replace(/"/g, '').trim() || '',
+      linkedinHandle: cols[4]?.replace(/"/g, '').trim() || '',
       atMozilla: cols[5]?.replace(/"/g, '').trim() || '',
       lookingForRoles: cols[6]?.replace(/"/g, '').trim() || '',
       interestedInRemote: cols[7]?.replace(/"/g, '').trim().toLowerCase() === 'yes',
@@ -26,28 +26,84 @@ async function fetchCSVData() {
 function populateDirectory(data) {
   const grid = document.getElementById('directory-grid');
   grid.innerHTML = '';
+
   data.forEach(person => {
     const item = document.createElement('div');
     item.classList.add('col-md-4', 'grid-item');
-    item.innerHTML = `
-      <h2>${person.name}</h2>
-      <h3>${person.title}<br>${person.team}</h3>
-      <div class="linkedin-icon">
-        ${person.linkedin ? `<a href="https://www.linkedin.com/in/${person.linkedin}" target="_blank"><img src="linkedin.png" alt="LinkedIn";"></a>` : ''}
-      </div>
-      <h6>At Mozilla...</h6>
-      <p>${person.atMozilla}</p>
-      <h6>I'm looking for...</h6>
-      <p>${person.lookingForRoles}</p>
-      ${person.interestedInRelocation || person.interestedInRemote ? '<h6>Open To:</h6>' : ''}
-      <div class="pucks-wrapper">
-        ${person.interestedInRelocation ? '<span class="puck relocation">Relocation</span>' : ''}
-        ${person.interestedInRemote ? '<span class="puck remote">Remote</span>' : ''}
-      </div>
-    `;
+
+    // Create elements using textContent
+    const nameElement = document.createElement('h2');
+    nameElement.textContent = person.name;
+
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = `${person.title}\n${person.team}`;
+
+    const linkedinIcon = document.createElement('div');
+    linkedinIcon.classList.add('linkedin-icon');
+
+    // Build LinkedIn URL from handle and validate
+    if (person.linkedinHandle && isValidLinkedInHandle(person.linkedinHandle)) {
+      const linkedinLink = document.createElement('a');
+      linkedinLink.href = `https://linkedin.com/in/${person.linkedinHandle}`;
+      linkedinLink.target = "_blank";
+      const linkedinImg = document.createElement('img');
+      linkedinImg.src = 'linkedin.png';
+      linkedinImg.alt = 'LinkedIn';
+      linkedinLink.appendChild(linkedinImg);
+      linkedinIcon.appendChild(linkedinLink);
+    }
+
+    const atMozillaElement = document.createElement('h6');
+    atMozillaElement.textContent = 'At Mozilla...';
+
+    const atMozillaContent = document.createElement('p');
+    atMozillaContent.textContent = person.atMozilla;
+
+    const lookingForElement = document.createElement('h6');
+    lookingForElement.textContent = "I'm looking for...";
+
+    const lookingForContent = document.createElement('p');
+    lookingForContent.textContent = person.lookingForRoles;
+
+    // Create relocation and remote availability
+    const pucksWrapper = document.createElement('div');
+    pucksWrapper.classList.add('pucks-wrapper');
+
+    if (person.interestedInRelocation) {
+      const relocationPuck = document.createElement('span');
+      relocationPuck.classList.add('puck', 'relocation');
+      relocationPuck.textContent = 'Relocation';
+      pucksWrapper.appendChild(relocationPuck);
+    }
+
+    if (person.interestedInRemote) {
+      const remotePuck = document.createElement('span');
+      remotePuck.classList.add('puck', 'remote');
+      remotePuck.textContent = 'Remote';
+      pucksWrapper.appendChild(remotePuck);
+    }
+
+    // Append all elements to the item
+    item.appendChild(nameElement);
+    item.appendChild(titleElement);
+    item.appendChild(linkedinIcon);
+    item.appendChild(atMozillaElement);
+    item.appendChild(atMozillaContent);
+    item.appendChild(lookingForElement);
+    item.appendChild(lookingForContent);
+    item.appendChild(pucksWrapper);
+
+    // Append the item to the grid
     grid.appendChild(item);
   });
 }
+
+// Helper function to validate LinkedIn handles
+function isValidLinkedInHandle(handle) {
+  const handleRegex = /^[a-zA-Z0-9-]{3,100}$/; // Only allows 3-100 characters
+  return handleRegex.test(handle) && !handle.startsWith('-') && !handle.endsWith('-');
+}
+
 
 // Populate dropdown options
 function populateDropdownOptions(data) {
