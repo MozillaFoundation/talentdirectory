@@ -36,7 +36,7 @@ function populateDirectory(data) {
     nameElement.textContent = person.name;
 
     const titleElement = document.createElement('h3');
-    titleElement.textContent = `${person.title}\n${person.team}`;
+    titleElement.textContent = `${person.title}, ${person.team}`;
 
     const linkedinIcon = document.createElement('div');
     linkedinIcon.classList.add('linkedin-icon');
@@ -65,6 +65,9 @@ function populateDirectory(data) {
     const lookingForContent = document.createElement('p');
     lookingForContent.textContent = person.lookingForRoles;
 
+    const opentoContent = document.createElement('h6');
+    opentoContent.textContent = "Open To";
+
     // Create relocation and remote availability
     const pucksWrapper = document.createElement('div');
     pucksWrapper.classList.add('pucks-wrapper');
@@ -91,6 +94,7 @@ function populateDirectory(data) {
     item.appendChild(atMozillaContent);
     item.appendChild(lookingForElement);
     item.appendChild(lookingForContent);
+    item.appendChild(opentoContent);
     item.appendChild(pucksWrapper);
 
     // Append the item to the grid
